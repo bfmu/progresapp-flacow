@@ -14,7 +14,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly repositoryUser: Repository<User>,
-    private readonly rolesService: RolesService
+    private readonly rolesService: RolesService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -38,6 +38,13 @@ export class UsersService {
     return await this.repositoryUser.findOneBy({ email });
   }
 
+  async findOneByEmailWithPassword(email: string) {
+    return await this.repositoryUser.findOne({
+      where: { email },
+      select: ['id', 'full_name', 'email', 'password'],
+    });
+  }
+
   async findByName(full_name: string) {
     return await this.repositoryUser.findOneBy({ full_name });
   }
@@ -58,13 +65,18 @@ export class UsersService {
     return await this.repositoryUser.softDelete(id);
   }
 
-  async createAdminUser(full_name: string, email: string, password: string, roles: Role[]) {
+  async createAdminUser(
+    full_name: string,
+    email: string,
+    password: string,
+    roles: Role[],
+  ) {
     const adminUser = new User();
     adminUser.full_name = full_name;
     adminUser.email = email;
     adminUser.password = await bcryptjs.hash(password, 10);
     adminUser.roles = roles;
-    
+
     return await this.repositoryUser.save(adminUser);
   }
 }

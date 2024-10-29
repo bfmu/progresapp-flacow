@@ -28,7 +28,7 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginDto) {
-    const user = await this.usersService.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmailWithPassword(email);
 
     if (!user) {
       throw new BadRequestException('Dont exists user');
@@ -40,7 +40,9 @@ export class AuthService {
       throw new BadRequestException('Invalid password');
     }
 
-    const payload = { email: user.email, sub: user.id };
+    const roles = user.roles.map((role) => role.name)
+
+    const payload = { email: user.email, sub: user.id, roles };
 
     const jwtToken = await this.jwtService.signAsync(payload);
 

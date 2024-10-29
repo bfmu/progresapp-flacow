@@ -1,18 +1,23 @@
-import { Exercise } from "src/exercises/entities/exercise.entity";
-import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Exercise } from 'src/exercises/entities/exercise.entity';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Muscle {
-    
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @DeleteDateColumn()
-    deletedAt: Date;
+  @DeleteDateColumn({ select: false })
+  deletedAt: Date;
 
-    @OneToMany(() => Exercise,(exercise) => exercise.muscle)
-    exercises: Exercise[];
+  @OneToMany(() => Exercise, (exercise) => exercise.muscle)
+  exercises: Exercise[];
 }

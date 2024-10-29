@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { MusclesService } from './muscles.service';
 import { CreateMuscleDto } from './dto/create-muscle.dto';
 import { UpdateMuscleDto } from './dto/update-muscle.dto';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
+@Auth(['admin'])
 @Controller('muscles')
 export class MusclesController {
   constructor(private readonly musclesService: MusclesService) {}
@@ -13,6 +15,7 @@ export class MusclesController {
   }
 
   @Get()
+  @Auth(['user'])
   findAll() {
     return this.musclesService.findAll();
   }

@@ -15,7 +15,7 @@ export class Role {
   @Column()
   name: string;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ select: false })
   deletedAt: Date;
 
   @ManyToMany(() => User, (user) => user.roles)

@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
+@Auth(['admin'])
 @Controller('exercises')
 export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
@@ -12,11 +14,13 @@ export class ExercisesController {
     return this.exercisesService.create(createExerciseDto);
   }
 
+  @Auth(['user'])
   @Get()
   findAll() {
     return this.exercisesService.findAll();
   }
 
+  @Auth(['user'])
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.exercisesService.findOne(id);
