@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { ExercisesModule } from './exercises/exercises.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MusclesModule } from './muscles/muscles.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { RolesModule } from './roles/roles.module';
+import { InitModule } from './init/init.module';
 
 @Module({
   imports: [
@@ -15,8 +19,12 @@ import { MusclesModule } from './muscles/muscles.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    InitModule,
     ExercisesModule,
-    MusclesModule
+    MusclesModule,
+    UsersModule,
+    AuthModule,
+    RolesModule,
   ],
   controllers: [],
   providers: [],
