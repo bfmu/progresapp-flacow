@@ -8,6 +8,7 @@ import { RolesService } from 'src/roles/roles.service';
 import { Role } from 'src/roles/entities/role.entity';
 
 import * as bcryptjs from 'bcryptjs';
+import { ActiveUserI } from 'src/common/active-user.interface';
 
 @Injectable()
 export class UsersService {
@@ -78,5 +79,14 @@ export class UsersService {
     adminUser.roles = roles;
 
     return await this.repositoryUser.save(adminUser);
+  }
+
+  async findMe(user: ActiveUserI) {
+    const userDB = await this.repositoryUser.findOneBy({ id: user.sub });
+    return {
+      name: userDB.full_name,
+      email: userDB.email,
+      roles: userDB.roles.map(role => role.name)
+    };
   }
 }
