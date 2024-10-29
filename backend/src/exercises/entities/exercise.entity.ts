@@ -1,9 +1,11 @@
+import { LiftingHistory } from 'src/lifting-histories/entities/lifting-history.entity';
 import { Muscle } from 'src/muscles/entities/muscle.entity';
 import {
   Column,
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -23,4 +25,7 @@ export class Exercise {
 
   @ManyToOne(() => Muscle, (muscle) => muscle.id, { eager: true })
   muscle: Muscle;
+
+  @OneToMany(() => LiftingHistory, (liftingHistory) => liftingHistory.exercise)
+  liftingHistory: LiftingHistory[];
 }

@@ -9,7 +9,8 @@ import { MusclesService } from 'src/muscles/muscles.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Exercise]), MusclesModule],
   controllers: [ExercisesController],
-  providers: [ExercisesService, MusclesService]
+  providers: [ExercisesService],
+  exports: [ExercisesService,TypeOrmModule]
 })
 export class ExercisesModule {}
  

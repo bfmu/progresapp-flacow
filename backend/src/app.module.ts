@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { InitModule } from './init/init.module';
+import { LiftingHistoriesModule } from './lifting-histories/lifting-histories.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { InitModule } from './init/init.module';
     UsersModule,
     AuthModule,
     RolesModule,
+    LiftingHistoriesModule,
   ],
   controllers: [],
   providers: [],
