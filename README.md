@@ -9,39 +9,49 @@ FLACOW es una aplicación diseñada para ayudarte a llevar un registro detallado
 - **Gráficas de Progreso**: Visualiza cómo has aumentado tu fuerza y resistencia con gráficas claras y motivadoras.
 - **Modo Claro/Oscuro**: Cambia fácilmente entre los modos claro y oscuro para una mejor experiencia de usuario.
 
-## Instalación y Configuración
 
-### Prerrequisitos
+## Correr la Aplicación con Docker
 
-- [Node.js](https://nodejs.org/en/) v14 o superior
-- [npm](https://www.npmjs.com/) o [yarn](https://yarnpkg.com/)
+Para ejecutar FLACOW usando Docker, sigue estos pasos:
 
-### Instalación
+1. Asegúrate de tener [Docker](https://www.docker.com/) y [Docker Compose](https://docs.docker.com/compose/) instalados.
 
-1. Clona el repositorio:
-   ```bash
-   git clone https://github.com/redflox/progresapp-flacow.git
-   cd progresapp-flacow
-   ```
+2. Configura tus variables de entorno en un archivo `.env` en el mismo directorio que `docker-compose.yml`:
 
-2. Instala las dependencias:
-   ```bash
-   npm install
-   # o si prefieres yarn
-   yarn install
-   ```
-
-3. Configura las variables de entorno. Crea un archivo `.env` en la raíz del proyecto y añade las siguientes variables:
    ```env
-   REACT_APP_API_URL=http://localhost:5000
+   POSTGRES_USER=ejemplo_usuario
+   POSTGRES_PASSWORD=ejemplo_password
+   POSTGRES_DB=flacow_db
+   POSTGRES_HOST=postgres
+   POSTGRES_PORT=5432
+   BACKEND_SYNCHRONIZE=false
+   PUBLIC_API_BASE_URL=http://localhost:81/api
+   ADMIN_EMAIL=admin@flacow.com
+   ADMIN_PASSWORD=ejemplo_password_admin
    ```
 
-4. Inicia el servidor de desarrollo:
+3. Construye y levanta los contenedores:
    ```bash
-   npm run dev
-   # o con yarn
-   yarn dev
+   docker-compose up --build
    ```
+
+4. Accede a la aplicación:
+   - Frontend: `http://localhost`
+   - Backend: Se maneja internamente por Nginx, todas las llamadas a `/api` se redirigen al backend.
+
+## Variables de Entorno
+
+| Variable            | Descripción                                     | Valor de Ejemplo                |
+|---------------------|-------------------------------------------------|---------------------------------|
+| POSTGRES_USER       | Usuario de la base de datos PostgreSQL          | `ejemplo_usuario`               |
+| POSTGRES_PASSWORD   | Contraseña del usuario PostgreSQL               | `ejemplo_password`              |
+| POSTGRES_DB         | Nombre de la base de datos                      | `flacow_db`                     |
+| POSTGRES_HOST       | Host de la base de datos PostgreSQL             | `postgres` (nombre del contenedor) |
+| POSTGRES_PORT       | Puerto de PostgreSQL                            | `5432`                          |
+| BACKEND_SYNCHRONIZE | Sincronizar el esquema de la base de datos (NO en prod) | `false`                    |
+| PUBLIC_API_BASE_URL | URL base de la API en prod             | `http://localhost:81/api`       |
+| ADMIN_EMAIL         | Email del usuario administrador predeterminado  | `admin@flacow.com`              |
+| ADMIN_PASSWORD      | Contraseña del usuario administrador predeterminado | `defaultpassword`     |
 
 ## Estructura del Proyecto
 
@@ -80,7 +90,7 @@ FLACOW cuenta con dos temas visuales: claro y oscuro, que se pueden alternar a t
 ## Tecnologías Utilizadas
 
 - **Frontend**: React, Material UI, Zustand (para gestión de estado).
-- **Backend**: Se espera que la API esté desplegada localmente o en un servidor remoto accesible mediante `REACT_APP_API_URL`.
+- **Backend**: NestJS, PostgreSQL.
 - **Gestión de Formularios y Validaciones**: Formik y Yup.
 - **Notificaciones**: Notistack.
 
