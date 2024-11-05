@@ -134,9 +134,6 @@ const MuscleList = () => {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
-        Administración de Músculos
-      </Typography>
       <Button
         variant="contained"
         color="primary"
