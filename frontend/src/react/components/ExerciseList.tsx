@@ -13,14 +13,11 @@ import {
   TableRow,
   Paper,
   TablePagination,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Autocomplete,
 } from "@mui/material";
 import { Add, Edit, Delete } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
@@ -86,7 +83,7 @@ const ExerciseList = () => {
     formik.resetForm();
     formik.setValues(
       exercise
-        ? { name: exercise.name, description: exercise.description, muscleId: exercise.muscleId }
+        ? { name: exercise.name, description: exercise.description, muscleId: exercise.muscle?.id }
         : { name: "", description: "", muscleId: "" }
     );
     setOpen(true);
@@ -146,9 +143,6 @@ const ExerciseList = () => {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
-        Administración de Ejercicios
-      </Typography>
       <Button
         variant="contained"
         color="primary"
@@ -183,7 +177,7 @@ const ExerciseList = () => {
                   <TableCell>{exercise.name}</TableCell>
                   <TableCell>{exercise.description}</TableCell>
                   <TableCell>
-                    {muscles.find((muscle) => muscle.id === exercise.muscle?.id)?.name}
+                    {muscles.find((muscle) => muscle.id === exercise.muscle.id)?.name}
                   </TableCell>
                   <TableCell align="right">
                     <IconButton color="primary" onClick={() => handleOpen(exercise)}>
@@ -242,23 +236,24 @@ const ExerciseList = () => {
               error={formik.touched.description && Boolean(formik.errors.description)}
               helperText={formik.touched.description && formik.errors.description}
             />
-            <FormControl fullWidth margin="dense">
-              <InputLabel id="muscle-select-label">Músculo</InputLabel>
-              <Select
-                labelId="muscle-select-label"
-                name="muscleId"
-                value={formik.values.muscleId}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.muscleId && Boolean(formik.errors.muscleId)}
-              >
-                {muscles.map((muscle) => (
-                  <MenuItem key={muscle.id} value={muscle.id}>
-                    {muscle.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              options={muscles}
+              getOptionLabel={(option) => option.name}
+              value={muscles.find((muscle) => muscle.id === formik.values.muscleId) || null}
+              onChange={(event, newValue) => {
+                formik.setFieldValue("muscleId", newValue?.id || "");
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Músculo"
+                  margin="dense"
+                  fullWidth
+                  error={formik.touched.muscleId && Boolean(formik.errors.muscleId)}
+                  helperText={formik.touched.muscleId && formik.errors.muscleId}
+                />
+              )}
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="primary">
