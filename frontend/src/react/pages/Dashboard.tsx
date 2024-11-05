@@ -1,13 +1,13 @@
 import React from "react";
 import Navbar from "../components/Navbar";
-import ExerciseList from "../components/ExercisesList";
+import ExerciseListDashboard from "../components/ExercisesListDashboard";
 import {Button, Container} from '@mui/material';
 
 export default function Dashboard() {
   return (
     <Container>
       <Navbar />
-      <ExerciseList />
+      <ExerciseListDashboard />
     </Container>
   );
 }
