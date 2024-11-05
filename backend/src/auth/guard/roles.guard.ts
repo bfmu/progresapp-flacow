@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -24,6 +25,14 @@ export class RolesGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest();
 
+    // Si no hay usuario, el token es inválido o no está autenticado
+    if (!user) {
+      throw new UnauthorizedException({
+        error: 'invalid_token',
+        message: 'Token is missing or invalid.',
+      });
+    }
+
     if (user.roles?.some((role) => role === 'admin')) {
       return true;
     }
@@ -31,7 +40,10 @@ export class RolesGuard implements CanActivate {
     const haveRole = requiredRoles.some((role) => user.roles?.includes(role));
 
     if (!haveRole) {
-      throw new UnauthorizedException();
+      throw new ForbiddenException({
+        error: 'insufficient_permissions',
+        message: 'You do not have permission to access this resource.',
+      });
     }
 
     return true;

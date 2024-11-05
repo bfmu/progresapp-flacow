@@ -15,7 +15,7 @@ export class MusclesController {
   }
 
   @Get()
-  @Auth(['user'])
+  @Auth(['user','admin'])
   findAll() {
     return this.musclesService.findAll();
   }
