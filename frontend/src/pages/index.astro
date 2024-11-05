@@ -1,15 +1,77 @@
 ---
-import Navbar from '../astro/components/Navbar.astro';
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Welcome to Astro.">
-	<header>
-		<Navbar />
-	</header>
-	<main>
-		BIENVEIDOS A FLACOW APP
-	</main>
+<Layout title="FLACOW - Lleva tu Progreso en el Gimnasio al Siguiente Nivel">
+  <header>
+    <nav class="bg-naranja p-4 text-negro shadow-md">
+      <div class="container mx-auto flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold">Progresapp-FLACOW</a>
+        <div class="flex items-center space-x-4">
+          <a href="/app/register" class="text-negro hover:underline">Registrarse</a>
+          <a href="/app/login" class="text-negro hover:underline">Entrar</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+  
+  <main>
+    <section class="hero bg-naranja text-negro py-20">
+      <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl font-bold mb-4">Bienvenidos a FLACOW</h1>
+        <p class="text-xl mb-6">
+          La mejor aplicación para registrar tu progreso en el gimnasio y lograr tus objetivos de fuerza.
+        </p>
+        <a href="/app/register" class="bg-amarillo text-negro px-6 py-3 rounded-lg text-lg font-semibold hover:bg-naranja hover:text-claro transition-all">
+          Regístrate Gratis
+        </a>
+      </div>
+    </section>
+
+    <section class="features py-20 bg-claro">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-12">¿Qué Ofrecemos?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="feature-card p-6 bg-white shadow-lg rounded-lg">
+            <h3 class="text-2xl font-semibold mb-4">Registro de Ejercicios</h3>
+            <p>
+              Lleva un control detallado de cada uno de los ejercicios que realizas en el gimnasio, incluyendo el número de repeticiones y el peso utilizado.
+            </p>
+          </div>
+          <div class="feature-card p-6 bg-white shadow-lg rounded-lg">
+            <h3 class="text-2xl font-semibold mb-4">Historial de Levantamientos</h3>
+            <p>
+              Revisa tu historial de peso para ver cómo has progresado a lo largo del tiempo y ajusta tu rutina según tus objetivos.
+            </p>
+          </div>
+          <div class="feature-card p-6 bg-white shadow-lg rounded-lg">
+            <h3 class="text-2xl font-semibold mb-4">Gráficas de Progreso</h3>
+            <p>
+              Visualiza tu progreso con gráficas que muestran cómo has aumentado tu fuerza y resistencia a lo largo del tiempo.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta bg-gris text-claro py-20">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-6">Únete a FLACOW Hoy Mismo</h2>
+        <p class="text-lg mb-8">
+          Empieza a controlar tu progreso en el gimnasio y lleva tu entrenamiento al siguiente nivel.
+        </p>
+        <a href="/app/register" class="bg-amarillo text-negro px-6 py-3 rounded-lg text-lg font-semibold hover:bg-naranja hover:text-claro transition-all">
+          Comienza Ahora
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-negro text-claro py-12">
+    <div class="container mx-auto px-4 text-center">
+      <p>© 2024 FLACOW. Todos los derechos reservados.</p>
+      <p>Proyecto de Código Abierto - <a href="https://github.com/redflox/progresapp-flacow" target="_blank" class="text-amarillo hover:underline">GitHub</a></p>
+      <p>Para consultas o contribuciones, envía un correo a <a href="mailto:bfmumo@gmail.com" class="text-amarillo hover:underline">bfmumo@gmail.com</a></p>
+    </div>
+  </footer>
 </Layout>
-
-
