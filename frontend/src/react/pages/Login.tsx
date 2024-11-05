@@ -2,110 +2,132 @@ import React, { useEffect, useState } from "react";
 import { loginRequest } from "../../api/auth";
 import { useAuthStore } from "../../store/auth";
 import { userInfoRequest } from "../../api/users";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Container,
+  Paper,
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+} from "@mui/material";
+import { useSnackbar } from "notistack";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import Navbar from "../components/Navbar";
 
 export default function Login() {
+  const { enqueueSnackbar } = useSnackbar();
   const { setToken, token } = useAuthStore((state) => state);
   const setProfile = useAuthStore((store) => store.setProfile);
-  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const email = (e.currentTarget.elements[0] as HTMLInputElement).value;
-    const password = (e.currentTarget.elements[1] as HTMLInputElement).value;
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: Yup.object({
+      email: Yup.string()
+        .email("Email inválido")
+        .required("El email es requerido"),
+      password: Yup.string().required("La contraseña es requerida"),
+    }),
+    onSubmit: async (values) => {
+      try {
+        const res = await loginRequest(values.email, values.password);
 
-    const res = await loginRequest(email, password);
-
-    if (res.status >= 200 && res.status < 300) {
-      const token = res.data.accessToken;
-      setToken(token);
-      const infoUser = await userInfoRequest();
-      setProfile(infoUser);
-    } else {
-      if (res.response && res.response.status === 400) {
-        setErrorMessage("Error en el inicio de sesión");
+        if (res.status >= 200 && res.status < 300) {
+          const token = res.data.accessToken;
+          setToken(token);
+          const infoUser = await userInfoRequest();
+          setProfile(infoUser);
+          enqueueSnackbar("Inicio de sesión exitoso", { variant: "success" });
+          navigate("/app");
+        } else {
+          enqueueSnackbar("Error en el inicio de sesión", { variant: "error" });
+        }
+      } catch (error) {
+        enqueueSnackbar(
+          "Error en el inicio de sesión. Por favor, inténtalo de nuevo.",
+          { variant: "error" }
+        );
       }
-    }
-  };
+    },
+  });
 
   useEffect(() => {
     if (token) {
-      navigate("/app/dashboard");
+      navigate("/app");
     }
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
-      <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
-        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-          <a href="/">
-            {/* Logo */}
-            <img
-              src="https://storage.googleapis.com/devitary-image-host.appspot.com/15846435184459982716-LogoMakr_7POjrN.png"
-              className="w-32 mx-auto"
-            />
-          </a>
-          <div className="mt-12 flex flex-col items-center">
-            <h1 className="text-2xl xl:text-3xl font-extrabold text-left">Identificate</h1>
-            <div className="w-full flex-1 mt-8">
-              <div className="mx-auto max-w-xs">
-                <form onSubmit={handleSubmit}>
-                  <input
-                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                    type="email"
-                    name="email"
-                    placeholder="Correo"
-                    autoComplete="email"
-                  />
-                  <input
-                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                    type="password"
-                    name="password"
-                    placeholder="Contraseña"
-                    autoComplete="current-password"
-                  />
-
-                  <button
-                    type="submit"
-                    className="mt-5 w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                  >
-                    Entrar
-                  </button>
-                </form>
-
-                {errorMessage ? (
-                  <p className="mt-6 text-xs text-red-600 text-center">
-                    {errorMessage}
-                  </p>
-                ) : (
-                  <></>
-                )}
-
-                <p className="mt-4 text-sm font-light text-gray-500 dark:text-gray-400">
-                  ¿No tienes una cuenta?{" "}
-                  <Link
-                    to="/app/register"
-                    className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                  >
-                    Regístrate aquí.
-                  </Link>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex-1 bg-indigo-100 text-center hidden lg:flex">
-          <div
-            className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-            style={{
-              backgroundImage:
-                "url('https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg')",
+    <>
+      <Navbar />
+      <Container component="main" maxWidth="xs">
+        <Paper elevation={3} sx={{ padding: 4, marginTop: 6 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
-          ></div>
-        </div>
-      </div>
-    </div>
+          >
+            <Typography component="h1" variant="h5">
+              Identifícate
+            </Typography>
+            <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 3 }}>
+              <TextField
+                fullWidth
+                id="email"
+                name="email"
+                label="Correo Electrónico"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
+                margin="normal"
+              />
+              <TextField
+                fullWidth
+                id="password"
+                name="password"
+                label="Contraseña"
+                type="password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.password && Boolean(formik.errors.password)
+                }
+                helperText={formik.touched.password && formik.errors.password}
+                margin="normal"
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Entrar
+              </Button>
+              <Typography variant="body2" align="center">
+                ¿No tienes una cuenta?{" "}
+                <Link
+                  to="/app/register"
+                  style={{ color: "#1976d2", textDecoration: "none" }}
+                >
+                  Regístrate aquí.
+                </Link>
+              </Typography>
+            </Box>
+          </Box>
+        </Paper>
+      </Container>
+    </>
   );
 }
