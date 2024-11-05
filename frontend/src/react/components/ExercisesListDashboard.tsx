@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importamos useNavigate
 import { getAllExercises } from "../../api/exercises";
 import Swal from "sweetalert2";
 import {
@@ -16,6 +17,7 @@ import { enqueueSnackbar } from "notistack";
 const ExerciseListDashboard = () => {
   const [exercises, setExercises] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -34,11 +36,7 @@ const ExerciseListDashboard = () => {
   );
 
   const handleCardClick = (exercise) => {
-    Swal.fire({
-      icon: "info",
-      title: exercise.name,
-      text: exercise.description,
-    });
+    navigate(`/app/lifting-histories/exercises/${exercise.id}`);
   };
 
   return (
