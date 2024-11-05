@@ -1,13 +1,7 @@
 import apiClient from "../lib/axios";
 
 export const loginRequest = async (email: string, password: string) => {
-  let response;
-  try {
-    response = await apiClient.post("/auth/login", { email, password });
-  } catch (error) {
-    return error;
-  }
-  return response;
+  return await apiClient.post("/auth/login", { email, password });
 };
 
 export const registerRequest = async (
@@ -15,15 +9,9 @@ export const registerRequest = async (
   email: string,
   password: string
 ) => {
-  let response;
-  try {
-    response = await apiClient.post("/auth/register", {
-      full_name,
-      email,
-      password,
-    });
-  } catch (error) {
-    throw new Error('Error registro')
-  }
-  return response;
+  return await apiClient.post("/auth/register", {
+    full_name,
+    email,
+    password,
+  });
 };
