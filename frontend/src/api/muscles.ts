@@ -5,7 +5,7 @@ export const getAllMuscles = async () => {
 };
 
 export const updateMuscle = async (id: number, values: any) => {
-  return await apiClient.put(`/muscles/${id}`, values);
+  return await apiClient.patch(`/muscles/${id}`, values);
 };
 
 export const createMuscle = async (values: any) => {
