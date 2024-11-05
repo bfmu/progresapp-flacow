@@ -12,6 +12,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  TablePagination,
 } from "@mui/material";
 import { Add, Edit, Delete } from "@mui/icons-material";
 import {
@@ -37,6 +38,9 @@ const MuscleList = () => {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { enqueueSnackbar } = useSnackbar();
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     fetchMuscles();
@@ -103,6 +107,7 @@ const MuscleList = () => {
         fetchMuscles();
         handleClose();
       } catch (error) {
+        console.log(error);
         enqueueSnackbar("Error al guardar el músculo", { variant: "error" });
       }
     },
@@ -116,6 +121,15 @@ const MuscleList = () => {
     } catch (error) {
       enqueueSnackbar("Error al eliminar el músculo", { variant: "error" });
     }
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   return (
@@ -144,31 +158,44 @@ const MuscleList = () => {
           <TableHead>
             <TableRow>
               <TableCell>Nombre</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell align="right">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredMuscles.map((muscle) => (
-              <TableRow key={muscle.id}>
-                <TableCell>{muscle.name}</TableCell>
-                <TableCell>
-                  <IconButton color="primary" onClick={() => handleOpen(muscle)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    color="secondary"
-                    onClick={() => handleDelete(muscle.id)}
-                  >
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {filteredMuscles
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((muscle) => (
+                <TableRow key={muscle.id}>
+                  <TableCell>{muscle.name}</TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleOpen(muscle)}
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton
+                      color="secondary"
+                      onClick={() => handleDelete(muscle.id)}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={filteredMuscles.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25]}
+        />
       </TableContainer>
 
-      {/* Dialog for Add/Edit Muscle */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
           {selectedMuscle ? "Editar Músculo" : "Agregar Músculo"}
