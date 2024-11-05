@@ -9,12 +9,9 @@ const apiClient = axios.create({
   },
 });
 
-// Interceptor de solicitud para agregar el token de autenticación
 apiClient.interceptors.request.use(
   (config) => {
-    // Obtener el token del store
     const token = useAuthStore.getState().token;
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,14 +22,13 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Interceptor de respuesta para manejar errores globales
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Manejo de errores de autenticación, por ejemplo
-      console.error("No estás autenticado. Redireccionando a login...");
-      // Aquí podrías redirigir al usuario a la página de login
+      const logout = useAuthStore.getState().logout;
+      logout();
+      window.location.href = "/app/login";
     }
     return Promise.reject(error);
   }
