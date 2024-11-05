@@ -78,6 +78,19 @@ export class LiftingHistoriesService {
     return liftingHistory;
   }
 
+  // Obtener un registro de levantamiento por ID
+  async findForExercise(id: number, user: ActiveUserI) {
+    if (user.roles.includes('admin')) {
+      return this.liftingHistoriesRepository.find({
+        where: { exercise: { id } },
+      });
+    } else {
+      return this.liftingHistoriesRepository.find({
+        where: { exercise: { id }, user: { id: user.sub } },
+      });
+    }
+  }
+
   // Actualizar un registro de levantamiento
   async update(
     id: number,
