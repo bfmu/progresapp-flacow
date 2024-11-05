@@ -4,7 +4,7 @@ import { enqueueSnackbar } from "notistack"; // Importa enqueueSnackbar desde no
 
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: import.meta.env.PUBLIC_API_BASE_URL || "http://localhost:3000/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -50,7 +50,6 @@ apiClient.interceptors.response.use(
       }
 
       if (status === 403) {
-        console.log('BUENA PAPACHo')
         enqueueSnackbar("No tienes permiso para acceder a este recurso.", {
           variant: "warning",
         });
