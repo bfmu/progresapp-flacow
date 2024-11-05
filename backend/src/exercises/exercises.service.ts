@@ -16,12 +16,14 @@ export class ExercisesService {
   ) {}
 
   async create(createExerciseDto: CreateExerciseDto) {
-    const muscle = await this.muscleRepository.findOneBy({ id: createExerciseDto.muscleId });
+    const muscle = await this.muscleRepository.findOneBy({
+      id: createExerciseDto.muscleId,
+    });
 
     if (!muscle) {
       throw new BadRequestException('Muscle not found');
     }
-    
+
     const exercise = this.exerciseRepository.create({
       ...createExerciseDto,
       muscle,
@@ -39,6 +41,21 @@ export class ExercisesService {
   }
 
   async update(id: number, updateExerciseDto: UpdateExerciseDto) {
+    if (updateExerciseDto.muscleId) {
+      const muscle = await this.muscleRepository.findOneBy({
+        id: updateExerciseDto.muscleId,
+      });
+
+      if (!muscle) {
+        throw new BadRequestException('Muscle not found');
+      }
+
+      updateExerciseDto = this.exerciseRepository.create({
+        ...UpdateExerciseDto,
+        muscle,
+      });
+    }
+
     return await this.exerciseRepository.update(id, updateExerciseDto);
   }
 
