@@ -1,144 +1,165 @@
-import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/auth";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  Avatar,
+  Box,
+  Tooltip,
+} from "@mui/material";
+import { Brightness4, Brightness7 } from "@mui/icons-material";
 
 const Navbar = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const buttonRef = useRef(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  
+  // Usar acciones de Zustand de manera más específica para evitar ciclos infinitos de renders.
+  const logout = useAuthStore((state) => state.logout);
+  const isAuth = useAuthStore((state) => state.isAuth);
+  const profile = useAuthStore((state) => state.profile);
+  const theme = useAuthStore((state) => state.theme);
+  const toggleTheme = useAuthStore((state) => state.toggleTheme);
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const closeDropdown = () => {
-    setIsDropdownOpen(false);
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
-  const { logout, isAuth, profile } = useAuthStore((state) => state);
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isDropdownOpen && buttonRef.current && dropdownRef.current) {
-      const buttonRect = buttonRef.current.getBoundingClientRect();
-      dropdownRef.current.style.top = `${buttonRect.bottom + window.scrollY}px`;
-      dropdownRef.current.style.left = `${buttonRect.right - dropdownRef.current.offsetWidth + window.scrollX}px`;
-    }
-  }, [isDropdownOpen]);
+  const handleLogout = () => {
+    logout();
+    handleMenuClose();
+    window.location.href = "/";
+  };
 
   return (
-    <nav className="bg-white border-gray-200 dark:bg-gray-900">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a
-          href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6" sx={{ flex: 1 }}>
+          <Link to="/app" style={{ textDecoration: "none", color: "inherit" }}>
             FLACOW
-          </span>
-        </a>
-        <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-          <button
-            type="button"
-            ref={buttonRef}
-            onClick={toggleDropdown}
-            className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-            id="user-menu-button"
-            aria-expanded={isDropdownOpen ? "true" : "false"}
-          >
-            <span className="sr-only">Open user menu</span>
-            <img
-              className="w-8 h-8 rounded-full"
-              src="#"
-              alt="user photo"
-            />
-          </button>
-          {isDropdownOpen && (
-            <div
-              ref={dropdownRef}
-              className="absolute w-48 z-50 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600"
-              id="user-dropdown"
+          </Link>
+        </Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Tooltip title="Cambiar tema">
+            <IconButton
+              onClick={() => toggleTheme()}
+              color="inherit"
+              aria-label="toggle theme"
+              sx={{ mr: 2 }}
             >
-              <div className="px-4 py-3">
-                <span className="block text-sm text-gray-900 dark:text-white">
-                  {profile ? profile.name : "Invitado"}
-                </span>
-                <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                  {profile ? profile.email : "Registrate"}
-                </span>
-              </div>
-              <ul className="py-2" aria-labelledby="user-menu-button">
-                {profile ? (
-                  <>
-                    <li>
-                      <Link
-                        to="/app/dashboard"
-                        onClick={closeDropdown}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Dashboard
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/app/muscles"
-                        onClick={closeDropdown}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Musculos
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/app/exercises"
-                        onClick={closeDropdown}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Ejercicios
-                      </Link>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => {
-                          logout();
-                          closeDropdown();
-                          window.location.href = '/'
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Sign out
-                      </button>
-                    </li>
-                  </>
-                ) : (
-                  <>
-                    <li>
-                      <Link
-                        to="/app/login"
-                        onClick={closeDropdown}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Identificate
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/app/register"
-                        onClick={closeDropdown}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Registrarse
-                      </Link>
-                    </li>
-                  </>
-                )}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    </nav>
+              {theme === "dark" ? <Brightness7 /> : <Brightness4 />}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Abrir menú">
+            <IconButton
+              onClick={handleMenuOpen}
+              size="small"
+              sx={{ ml: 2 }}
+              aria-controls={open ? "account-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+            >
+              <Avatar
+                src="#"
+                alt={profile ? profile.name?.toUpperCase() : "Invitado"}
+              />
+            </IconButton>
+          </Tooltip>
+          <Menu
+            anchorEl={anchorEl}
+            id="account-menu"
+            open={open}
+            onClose={handleMenuClose}
+            onClick={handleMenuClose}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: "visible",
+                mt: 1.5,
+                "& .MuiAvatar-root": {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                "&:before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translateY(-50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          >
+            <Box sx={{ px: 2, py: 1 }}>
+              <Typography variant="body1">
+                {profile ? profile.name : "Invitado"}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                {profile ? profile.email : "Registrate"}
+              </Typography>
+            </Box>
+            {profile
+              ? [
+                  <MenuItem
+                    key="dashboard"
+                    component={Link}
+                    to="/app"
+                    onClick={handleMenuClose}
+                  >
+                    Dashboard
+                  </MenuItem>,
+                  <MenuItem
+                    key="settings"
+                    component={Link}
+                    to="/app/settings"
+                    onClick={handleMenuClose}
+                  >
+                    Configuración
+                  </MenuItem>,
+                  <MenuItem key="signout" onClick={handleLogout}>
+                    Cerrar sesión
+                  </MenuItem>,
+                ]
+              : [
+                  <MenuItem
+                    key="login"
+                    component={Link}
+                    to="/app/login"
+                    onClick={handleMenuClose}
+                  >
+                    Identifícate
+                  </MenuItem>,
+                  <MenuItem
+                    key="register"
+                    component={Link}
+                    to="/app/register"
+                    onClick={handleMenuClose}
+                  >
+                    Registrarse
+                  </MenuItem>,
+                ]}
+          </Menu>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 };
 
