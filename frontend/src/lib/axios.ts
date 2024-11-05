@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useAuthStore } from "../store/auth";
+import { enqueueSnackbar } from "notistack"; // Importa enqueueSnackbar desde notistack
+
 
 const apiClient = axios.create({
   baseURL: "http://localhost:3000/api",
@@ -22,13 +24,37 @@ apiClient.interceptors.request.use(
   }
 );
 
+// Interceptor de respuesta para manejar errores globales
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      const logout = useAuthStore.getState().logout;
-      logout();
-      window.location.href = "/app/login";
+    if (error.response) {
+      const { status, data } = error.response;
+
+      if (status === 401) {
+        const logout = useAuthStore.getState().logout;
+        switch (data.error) {
+          case "token_missing":
+          case "invalid_token":
+            logout();
+            window.location.href = "/app/login";
+            break;
+
+          case "token_expired":
+            logout();
+            break;
+
+          default:
+            logout();
+        }
+      }
+
+      if (status === 403) {
+        console.log('BUENA PAPACHo')
+        enqueueSnackbar("No tienes permiso para acceder a este recurso.", {
+          variant: "warning",
+        });
+      }
     }
     return Promise.reject(error);
   }
