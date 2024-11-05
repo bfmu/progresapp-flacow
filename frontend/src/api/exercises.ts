@@ -4,6 +4,10 @@ export const getAllExercises = async () => {
   return await apiClient.get("/exercises");
 };
 
+export const getExercise = async (id: number) => {
+  return await apiClient.get(`/exercises/${id}`);
+};
+
 export const updateExercises = async (id: number, values: any) => {
   return await apiClient.patch(`/exercises/${id}`, values);
 };
