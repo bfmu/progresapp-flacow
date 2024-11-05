@@ -2,16 +2,20 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Profile } from "../types/user";
 
+type Theme = "light" | "dark";
+
 type State = {
   token: string;
   profile: Profile;
   isAuth: boolean;
+  theme: Theme;
 };
 
 type Actions = {
   setToken: (token: string) => void;
   setProfile: (profile: Profile) => void;
   logout: () => void;
+  toggleTheme: () => void;
 };
 
 export const useAuthStore = create(
@@ -20,6 +24,7 @@ export const useAuthStore = create(
       token: "",
       profile: null,
       isAuth: false,
+      theme: "light",
       setToken: (token: string) =>
         set((state) => ({
           token,
@@ -35,7 +40,11 @@ export const useAuthStore = create(
           isAuth: false,
           profile: null,
         })),
+      toggleTheme: () =>
+        set((state) => ({
+          theme: state.theme === "light" ? "dark" : "light",
+        })),
     }),
-    { name: "token" }
+    { name: "auth-store" }
   )
 );
