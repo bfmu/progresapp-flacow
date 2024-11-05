@@ -34,6 +34,11 @@ export class LiftingHistoriesController {
     return this.liftingHistoriesService.findAll(user);
   }
 
+  @Get('exercises/:id')
+  findForExercise(@Param('id') id: number, @ActiveUser() user: ActiveUserI) {
+    return this.liftingHistoriesService.findForExercise(id,user);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: number, @ActiveUser() user: ActiveUserI) {
     return this.liftingHistoriesService.findOne(id,user);
