@@ -10,9 +10,22 @@ const { title } = Astro.props;
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="La mejor aplicación para registrar tu progreso en el gimnasio y lograr tus objetivos de fuerza." />
+    <meta name="keywords" content="gimnasio, progreso, levantamientos, fuerza, registro de ejercicios, fitness, entrenamiento" />
+    <meta name="author" content="FLACOW Team" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="{title}" />
+    <meta property="og:description" content="La mejor aplicación para registrar tu progreso en el gimnasio y lograr tus objetivos de fuerza." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://flacow.com" />
+    <meta property="og:image" content="/images/flacow-og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{title}" />
+    <meta name="twitter:description" content="La mejor aplicación para registrar tu progreso en el gimnasio y lograr tus objetivos de fuerza." />
+    <meta name="twitter:image" content="/images/flacow-twitter-image.jpg" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://flacow.com" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
@@ -20,4 +33,3 @@ const { title } = Astro.props;
     <slot />
   </body>
 </html>
-<style is:global></style>
