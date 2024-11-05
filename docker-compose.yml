@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: flacow-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: flacow-backend
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    expose:
+      - 3000
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - PUBLIC_API_BASE_URL=${PUBLIC_API_BASE_URL}
+    container_name: flacow-frontend
+    environment:
+      - PUBLIC_API_BASE_URL=${PUBLIC_API_BASE_URL}
+    expose:
+      - 4321
+
+  nginx:
+    image: nginx:latest
+    container_name: flacow-nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "81:80"  # Solo expone el puerto del Nginx
+    depends_on:
+      - frontend
+      - backend
