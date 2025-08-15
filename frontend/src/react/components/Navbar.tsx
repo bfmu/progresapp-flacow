@@ -126,14 +126,18 @@ const Navbar = () => {
                   >
                     Dashboard
                   </MenuItem>,
-                  <MenuItem
-                    key="settings"
-                    component={Link}
-                    to="/app/settings"
-                    onClick={handleMenuClose}
-                  >
-                    Configuración
-                  </MenuItem>,
+                  ...(profile?.roles?.includes("admin")
+                    ? [
+                        <MenuItem
+                          key="settings"
+                          component={Link}
+                          to="/app/settings"
+                          onClick={handleMenuClose}
+                        >
+                          Configuración
+                        </MenuItem>,
+                      ]
+                    : []),
                   <MenuItem key="signout" onClick={handleLogout}>
                     Cerrar sesión
                   </MenuItem>,
