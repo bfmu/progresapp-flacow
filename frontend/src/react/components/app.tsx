@@ -1,25 +1,28 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import React, { useMemo } from "react";
-import Login from "../pages/Login";
+import React, { useMemo, lazy, Suspense } from "react";
 import LayoutReact from "./LayoutReact";
+import Loading from "./Loading";
+import ErrorFallback from "./ErrorFallback";
+import Login from "../pages/Login";
 import Register from "../pages/SignupForm";
-import Dashboard from "../pages/Dashboard";
-import Profile from "./Profile";
+const Dashboard = lazy(() => import("../pages/Dashboard"));
+const Profile = lazy(() => import("./Profile"));
 import ProtectedRoute from "./ProtectedRoute";
 import { useAuthStore } from "../../store/auth";
 import { SnackbarProvider } from "notistack";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import Muscles from "../pages/Muscles";
-import Exercises from "../pages/Exercises";
-import AdminPanel from "../pages/AdminPanel";
-import LiftingHistoryPage from "../pages/LiftingHistoryPage";
-import SignupForm from "../pages/SignupForm";
+import { getAppTheme } from "../theme";
+const Muscles = lazy(() => import("../pages/Muscles"));
+const Exercises = lazy(() => import("../pages/Exercises"));
+const AdminPanel = lazy(() => import("../pages/AdminPanel"));
+const LiftingHistoryPage = lazy(() => import("../pages/LiftingHistoryPage"));
+import RoleRoute from "./RoleRoute";
 
 export const App = () => {
   const isAuth = useAuthStore((state) => state.isAuth);
   const themeMode = useAuthStore((state) => state.theme);
-  const toggleTheme = useAuthStore((state) => state.toggleTheme);
+  // const toggleTheme = useAuthStore((state) => state.toggleTheme);
 
   // Definir la paleta de colores clara y oscura
   const lightPalette = {
@@ -56,29 +59,28 @@ export const App = () => {
     },
   };
 
-  const theme = useMemo(
-    () =>
-      createTheme({
-        palette: themeMode === "dark" ? darkPalette : lightPalette,
-      }),
-    [themeMode]
-  );
+  const theme = useMemo(() => getAppTheme(themeMode), [themeMode]);
 
   const router = createBrowserRouter([
     {
       path: "app",
       element: <LayoutReact />,
+      errorElement: <ErrorFallback />,
       children: [
         { path: "login", element: <Login /> },
-        { path: "register", element: <SignupForm /> },
+        { path: "register", element: <Register /> },
         {
-          element: <ProtectedRoute isAllowed={isAuth} />, // Esto envuelve las rutas protegidas
+          element: <ProtectedRoute isAllowed={isAuth} />,
+          errorElement: <ErrorFallback />,
           children: [
             { path: "profile", element: <Profile /> },
             { path: "", element: <Dashboard /> },
             { path: "muscles", element: <Muscles /> },
             { path: "exercises", element: <Exercises /> },
-            { path: "settings/*", element: <AdminPanel /> },
+            {
+              element: <RoleRoute requiredRoles={["admin"]} />,
+              children: [{ path: "settings/*", element: <AdminPanel /> }],
+            },
             {
               path: "lifting-histories/exercises/:exerciseId",
               element: <LiftingHistoryPage />,
@@ -94,7 +96,9 @@ export const App = () => {
       <ThemeProvider theme={theme}>
         <SnackbarProvider maxSnack={5} autoHideDuration={3000}>
           <CssBaseline />
-          <RouterProvider router={router} />
+          <Suspense fallback={<Loading />}>
+            <RouterProvider router={router} />
+          </Suspense>
         </SnackbarProvider>
       </ThemeProvider>
     </React.StrictMode>

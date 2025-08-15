@@ -24,7 +24,7 @@ export const useAuthStore = create(
       token: "",
       profile: null,
       isAuth: false,
-      theme: "light",
+      theme: "dark",
       setToken: (token: string) =>
         set((state) => ({
           token,
