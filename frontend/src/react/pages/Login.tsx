@@ -78,18 +78,21 @@ export default function Login() {
             <Typography component="h1" variant="h5">
               Identifícate
             </Typography>
-            <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 3 }}>
+            <Box component="form" onSubmit={formik.handleSubmit} autoComplete="on" sx={{ mt: 3 }}>
               <TextField
                 fullWidth
                 id="email"
                 name="email"
                 label="Correo Electrónico"
+                type="email"
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 error={formik.touched.email && Boolean(formik.errors.email)}
                 helperText={formik.touched.email && formik.errors.email}
                 margin="normal"
+                autoComplete="username"
+                inputProps={{ autoCapitalize: 'none', autoCorrect: 'off', spellCheck: 'false' } as any}
               />
               <TextField
                 fullWidth
@@ -105,13 +108,21 @@ export default function Login() {
                 }
                 helperText={formik.touched.password && formik.errors.password}
                 margin="normal"
+                autoComplete="current-password"
               />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                <Link to="/app/forgot-password" style={{ textDecoration: 'none' }}>
+                  <Typography variant="body2" color="primary">
+                    ¿Olvidaste tu contraseña?
+                  </Typography>
+                </Link>
+              </Box>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 2, mb: 2 }}
               >
                 Entrar
               </Button>

@@ -5,6 +5,8 @@ import { LoginDto } from './dto/login.dto';
 import { Auth } from './decorators/auth.decorator';
 import { ActiveUser } from 'src/common/active-user.decorator';
 import { ActiveUserI } from 'src/common/active-user.interface';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,4 +32,15 @@ export class AuthController {
             ...user
         }
     }
+
+    @Post('forgot-password')
+    forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+        return this.authService.forgotPassword(forgotPasswordDto.email);
+    }
+
+    @Post('reset-password')
+    resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+        return this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.password);
+    }
+    
 }
