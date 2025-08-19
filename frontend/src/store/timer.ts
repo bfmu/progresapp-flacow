@@ -7,6 +7,10 @@ type TimerState = {
   isRunning: boolean;
   endAt: number | null;
   remainingMs: number; // usado cuando está en pausa
+  currentTotalMs: number; // total de la corrida actual (para %)
+  displayMode: 'compact' | 'overlay';
+  overlayHeight: 'half' | 'full';
+  highContrast: boolean;
 };
 
 type TimerActions = {
@@ -18,6 +22,9 @@ type TimerActions = {
   resume: () => void;
   reset: () => void;
   finalizeIfExpired: () => void;
+  setDisplayMode: (mode: 'compact' | 'overlay') => void;
+  toggleOverlayHeight: () => void;
+  toggleHighContrast: () => void;
 };
 
 export const useTimerStore = create(
@@ -28,6 +35,10 @@ export const useTimerStore = create(
       isRunning: false,
       endAt: null,
       remainingMs: 3 * 60 * 1000,
+      currentTotalMs: 3 * 60 * 1000,
+      displayMode: 'compact',
+      overlayHeight: 'half',
+      highContrast: false,
 
       toggleVisible: () => set((s) => ({ isVisible: !s.isVisible })),
       setVisible: (visible: boolean) => set({ isVisible: visible }),
@@ -37,6 +48,7 @@ export const useTimerStore = create(
           defaultDurationMs: Math.max(1000, Math.round(minutes * 60 * 1000)),
           // si no está corriendo, alineamos el restante al nuevo por defecto
           remainingMs: s.isRunning ? s.remainingMs : Math.max(1000, Math.round(minutes * 60 * 1000)),
+          currentTotalMs: s.isRunning ? s.currentTotalMs : Math.max(1000, Math.round(minutes * 60 * 1000)),
         })),
 
       start: (durationMs?: number) =>
@@ -47,6 +59,7 @@ export const useTimerStore = create(
             isRunning: true,
             endAt: now + ms,
             remainingMs: ms,
+            currentTotalMs: ms,
           };
         }),
 
@@ -70,6 +83,7 @@ export const useTimerStore = create(
           isRunning: false,
           endAt: null,
           remainingMs: s.defaultDurationMs,
+          currentTotalMs: s.defaultDurationMs,
         })),
 
       finalizeIfExpired: () =>
@@ -81,6 +95,10 @@ export const useTimerStore = create(
           }
           return {} as any;
         }),
+
+      setDisplayMode: (mode) => set({ displayMode: mode }),
+      toggleOverlayHeight: () => set((s) => ({ overlayHeight: s.overlayHeight === 'half' ? 'full' : 'half' })),
+      toggleHighContrast: () => set((s) => ({ highContrast: !s.highContrast })),
     }),
     { name: "timer-store" }
   )

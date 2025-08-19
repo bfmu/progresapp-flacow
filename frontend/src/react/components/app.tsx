@@ -18,6 +18,8 @@ const Exercises = lazy(() => import("../pages/Exercises"));
 const AdminPanel = lazy(() => import("../pages/AdminPanel"));
 const LiftingHistoryPage = lazy(() => import("../pages/LiftingHistoryPage"));
 import RoleRoute from "./RoleRoute";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 
 export const App = () => {
   const isAuth = useAuthStore((state) => state.isAuth);
@@ -69,6 +71,8 @@ export const App = () => {
       children: [
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
+        { path: "forgot-password", element: <ForgotPassword /> },
+        { path: "reset-password", element: <ResetPassword /> },
         {
           element: <ProtectedRoute isAllowed={isAuth} />,
           errorElement: <ErrorFallback />,
