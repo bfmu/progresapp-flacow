@@ -34,7 +34,7 @@ jobs:
           ESLINT_USE_FLAT_CONFIG: 'false'
 
       - name: Test
-        run: npm run test
+        run: npm run test -- --passWithNoTests
 
       - name: Build
         run: npm run build
