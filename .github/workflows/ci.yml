@@ -30,6 +30,8 @@ jobs:
 
       - name: Lint
         run: npm run lint
+        env:
+          ESLINT_USE_FLAT_CONFIG: 'false'
 
       - name: Test
         run: npm run test
@@ -54,7 +56,7 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: cd packages/shared && npm test -- --config jest.config.ts --watchAll=false
+        run: cd packages/shared && npm test -- --watchAll=false
 
   frontend:
     name: Frontend (Astro)
@@ -75,6 +77,9 @@ jobs:
       - name: Install (workspaces)
         run: npm ci
         working-directory: .
+
+      - name: Astro sync
+        run: npx astro sync
 
       - name: Type check
         run: npx tsc --noEmit
