@@ -4,7 +4,6 @@ import { LiftingHistoriesController } from './lifting-histories.controller';
 import { LiftingHistory } from './entities/lifting-history.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExercisesModule } from 'src/exercises/exercises.module';
-import { ExercisesService } from 'src/exercises/exercises.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([LiftingHistory]), ExercisesModule],

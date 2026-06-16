@@ -1,19 +1,14 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  CreateLiftingHistoryDto,
-  RequestCreateLiftingHistoryDto,
-} from './dto/create-lifting-history.dto';
+import { RequestCreateLiftingHistoryDto } from './dto/create-lifting-history.dto';
 import { UpdateLiftingHistoryDto } from './dto/update-lifting-history.dto';
 import { ActiveUserI } from 'src/common/active-user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LiftingHistory } from './entities/lifting-history.entity';
-import { ExercisesService } from 'src/exercises/exercises.service';
 import { Exercise } from 'src/exercises/entities/exercise.entity';
 
 @Injectable()
