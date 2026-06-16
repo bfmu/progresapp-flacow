@@ -1,5 +1,5 @@
 version: 2
-ignore-paths:
+paths-ignore:
   - "**/__tests__/**"
   - "**/*.test.ts"
   - "**/*.test.tsx"
