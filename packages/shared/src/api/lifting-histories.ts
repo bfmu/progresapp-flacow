@@ -1,4 +1,4 @@
-import apiClient from "../lib/axios";
+import apiClient from "./client";
 
 export const getAllLiftingHistories = async () => {
   return await apiClient.get("/lifting-histories");

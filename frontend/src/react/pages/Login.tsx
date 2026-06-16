@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { loginRequest } from "../../api/auth";
+import { loginRequest } from "@progresapp/shared/api/auth";
 import { useAuthStore } from "../../store/auth";
-import { userInfoRequest } from "../../api/users";
+import { userInfoRequest } from "@progresapp/shared/api/users";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Container,

@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useSnackbar } from "notistack";
-import { registerRequest } from "../../api/auth";
+import { registerRequest } from "@progresapp/shared/api/auth";
 import {
   TextField,
   Button,

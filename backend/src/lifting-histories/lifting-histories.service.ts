@@ -110,20 +110,9 @@ export class LiftingHistoriesService {
     return await this.liftingHistoriesRepository.save(liftingHistory);
   }
 
-  // Eliminar un registro de levantamiento (solo admin)
+  // Eliminar un registro de levantamiento (owner o admin)
   async remove(id: number, user: ActiveUserI) {
-    if (!user.roles.includes('admin')) {
-      throw new ForbiddenException(
-        'You do not have permission to delete this record',
-      );
-    }
-
-    const liftingHistory = await this.liftingHistoriesRepository.findOneBy({
-      id,
-    });
-    if (!liftingHistory) {
-      throw new NotFoundException(`LiftingHistory with ID ${id} not found`);
-    }
+    await this.findOne(id, user); // verifica existencia y ownership
 
     return await this.liftingHistoriesRepository.softDelete(id);
   }
