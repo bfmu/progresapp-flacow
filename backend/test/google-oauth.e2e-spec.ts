@@ -3,7 +3,6 @@ import {
   INestApplication,
   ValidationPipe,
   Injectable,
-  BadRequestException,
 } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
@@ -25,7 +24,7 @@ class StubGoogleStrategy extends GoogleStrategy {
   constructor() {
     // Skip the real constructor — provide minimal config
     // We override validate() so super() args don't matter
-    // @ts-ignore — intentional override of injectable
+    // @ts-expect-error — intentional override of injectable
     super(
       { get: () => 'stub' } as any,
       {
@@ -108,7 +107,6 @@ describe('Google OAuth (e2e)', () => {
 
   describe('POST /api/auth/google/id-token', () => {
     it('returns 200 with accessToken for a valid mocked id_token', async () => {
-      const user = makeFixedUser();
       mockVerifyIdToken.mockResolvedValueOnce({
         getPayload: () => ({
           sub: 'g-123',
@@ -117,11 +115,8 @@ describe('Google OAuth (e2e)', () => {
         }),
       });
 
-      // We need UsersService to work — but in e2e context with full AppModule
-      // that needs a DB. Use a lighter check: just verify the structure when
-      // the service layer would succeed. Since this is a full e2e that needs DB,
-      // we test the important error paths which don't need DB.
-      // The 200 path is covered by unit tests (auth.service.spec.ts).
+      // Full e2e 200 path requires DB; covered by unit tests in auth.service.spec.ts.
+      // This placeholder keeps the test suite aware of the happy path intent.
     });
 
     it('returns 401 with invalid_google_token when verifyIdToken throws', async () => {
