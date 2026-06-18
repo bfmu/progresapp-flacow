@@ -39,7 +39,7 @@ jobs:
 
       - name: Build APK
         working-directory: mobile
-        run: eas build --platform android --profile preview --non-interactive --output /tmp/flacow.apk
+        run: eas build --platform android --profile preview --non-interactive --local --output ${{ github.workspace }}/flacow.apk
 
       - name: Deploy APK to server
         uses: appleboy/ssh-action@v1.2.0
@@ -55,6 +55,5 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source: /tmp/flacow.apk
+          source: flacow.apk
           target: ~/docker/github/progresapp-flacow/downloads/
-          strip_components: 2
