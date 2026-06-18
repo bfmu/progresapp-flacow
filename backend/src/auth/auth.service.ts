@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, ServiceUnavailableException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, ServiceUnavailableException, Logger, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
@@ -13,6 +13,7 @@ import { generateResetToken, hashResetToken } from './utils/password-reset.util'
 import { ConfigService } from '@nestjs/config';
 import { MailService } from 'src/mail/mail.service';
 import { IsNull } from 'typeorm';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -115,5 +116,37 @@ export class AuthService {
     return {message: 'Password reset successfully'};
   }
 
+  async loginWithGoogleIdToken(idToken: string): Promise<{ accessToken: string }> {
+    const mobileClientId = this.configService.get<string>('GOOGLE_MOBILE_CLIENT_ID');
+    const client = new OAuth2Client(mobileClientId);
 
+    let payload: ReturnType<import('google-auth-library').LoginTicket['getPayload']>;
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience: mobileClientId,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      throw new UnauthorizedException({
+        error: 'invalid_google_token',
+        message: 'Google token is invalid or expired',
+      });
+    }
+
+    if (!payload?.email) {
+      throw new BadRequestException({
+        error: 'google_no_email',
+        message: 'Google account has no email',
+      });
+    }
+
+    const fullName = payload.name ?? payload.email.split('@')[0];
+    const user = await this.usersService.findOrCreateByGoogle(
+      payload.sub,
+      payload.email,
+      fullName,
+    );
+    return this.signToken(user);
+  }
 }

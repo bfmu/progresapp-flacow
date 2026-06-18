@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -9,6 +9,17 @@ import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { MailService } from 'src/mail/mail.service';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/roles/entities/role.entity';
+
+// ─── Mock google-auth-library ─────────────────────────────────────────────────
+const mockVerifyIdToken = jest.fn();
+const mockGetPayload = jest.fn();
+jest.mock('google-auth-library', () => {
+  return {
+    OAuth2Client: jest.fn().mockImplementation(() => ({
+      verifyIdToken: mockVerifyIdToken,
+    })),
+  };
+});
 
 // Mock bcryptjs at the module level so we can verify it's NOT called
 jest.mock('bcryptjs', () => ({
@@ -157,6 +168,100 @@ describe('AuthService', () => {
       expect(jwtService.signAsync).toHaveBeenCalledWith(
         expect.objectContaining({ roles: ['user', 'admin'] }),
       );
+    });
+  });
+
+  // ─── loginWithGoogleIdToken() — Phase 4 ─────────────────────────────────────
+
+  describe('loginWithGoogleIdToken()', () => {
+    beforeEach(() => {
+      mockVerifyIdToken.mockReset();
+      mockGetPayload.mockReset();
+    });
+
+    it('throws UnauthorizedException with error invalid_google_token when verifyIdToken throws', async () => {
+      mockVerifyIdToken.mockRejectedValueOnce(new Error('Token expired'));
+
+      let caught: UnauthorizedException | undefined;
+      try {
+        await service.loginWithGoogleIdToken('bad-token');
+      } catch (err) {
+        caught = err;
+      }
+
+      expect(caught).toBeInstanceOf(UnauthorizedException);
+      expect((caught as any).response.error).toBe('invalid_google_token');
+    });
+
+    it('throws BadRequestException with error google_no_email when payload has no email', async () => {
+      mockGetPayload.mockReturnValueOnce({ sub: 'g-123', email: undefined, name: 'Test' });
+      mockVerifyIdToken.mockResolvedValueOnce({ getPayload: mockGetPayload });
+
+      let caught: BadRequestException | undefined;
+      try {
+        await service.loginWithGoogleIdToken('token-no-email');
+      } catch (err) {
+        caught = err;
+      }
+
+      expect(caught).toBeInstanceOf(BadRequestException);
+      expect((caught as any).response.error).toBe('google_no_email');
+    });
+
+    it('calls findOrCreateByGoogle and returns accessToken for valid token', async () => {
+      const user = makeUser();
+      mockGetPayload.mockReturnValueOnce({
+        sub: 'g-123',
+        email: 'test@example.com',
+        name: 'Test User',
+      });
+      mockVerifyIdToken.mockResolvedValueOnce({ getPayload: mockGetPayload });
+      usersService.findOrCreateByGoogle.mockResolvedValueOnce(user);
+      jwtService.signAsync.mockResolvedValueOnce('jwt-token');
+
+      const result = await service.loginWithGoogleIdToken('valid-token');
+
+      expect(usersService.findOrCreateByGoogle).toHaveBeenCalledWith(
+        'g-123',
+        'test@example.com',
+        'Test User',
+      );
+      expect(result).toEqual({ accessToken: 'jwt-token' });
+    });
+
+    it('falls back to email prefix as name when payload.name is absent', async () => {
+      const user = makeUser();
+      mockGetPayload.mockReturnValueOnce({
+        sub: 'g-123',
+        email: 'john.doe@example.com',
+        name: undefined,
+      });
+      mockVerifyIdToken.mockResolvedValueOnce({ getPayload: mockGetPayload });
+      usersService.findOrCreateByGoogle.mockResolvedValueOnce(user);
+      jwtService.signAsync.mockResolvedValueOnce('jwt-token');
+
+      await service.loginWithGoogleIdToken('valid-token');
+
+      expect(usersService.findOrCreateByGoogle).toHaveBeenCalledWith(
+        'g-123',
+        'john.doe@example.com',
+        'john.doe', // email.split('@')[0]
+      );
+    });
+
+    it('handles null payload from getPayload() as invalid token', async () => {
+      mockGetPayload.mockReturnValueOnce(null);
+      mockVerifyIdToken.mockResolvedValueOnce({ getPayload: mockGetPayload });
+
+      let caught: BadRequestException | undefined;
+      try {
+        await service.loginWithGoogleIdToken('token-null-payload');
+      } catch (err) {
+        caught = err;
+      }
+
+      expect(caught).toBeInstanceOf(BadRequestException);
+      expect((caught as any).response.error).toBe('google_no_email');
     });
   });
 });
