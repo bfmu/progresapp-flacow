@@ -1,5 +1,4 @@
 {
-  "_comment": "EXPO_PUBLIC_API_BASE_URL values below are placeholders. Replace with real backend URLs per environment (see backend/.env.example for CORS_ORIGINS that must allow these origins). development points at a LAN/tunnel URL for Expo Go on a physical device; preview/production point at deployed API hosts.",
   "cli": {
     "version": ">= 13.0.0",
     "appVersionSource": "remote"
@@ -14,14 +13,19 @@
     },
     "preview": {
       "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://staging-api.progresapp.example.com/api"
+        "EXPO_PUBLIC_API_BASE_URL": "https://flacow.bfmu.dev/api",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "198417734095-7lo4l5oqv09ksrufeo5leteo8u803c8t.apps.googleusercontent.com"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://api.progresapp.example.com/api"
+        "EXPO_PUBLIC_API_BASE_URL": "https://flacow.bfmu.dev/api",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "198417734095-7lo4l5oqv09ksrufeo5leteo8u803c8t.apps.googleusercontent.com"
       }
     }
   },
