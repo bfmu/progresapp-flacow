@@ -1,27 +1,33 @@
-FROM node:lts AS base
+FROM node:lts AS builder
 WORKDIR /app
 
+# Copy workspace manifest files
 COPY package.json package-lock.json ./
+# Copy shared package (workspace dependency)
+COPY packages/shared/ ./packages/shared/
+# Copy frontend source
+COPY frontend/ ./frontend/
 
-FROM base AS prod-deps
-RUN npm install --production
+# Install all workspace deps from root (resolves @progresapp/shared locally)
+RUN npm ci
 
-FROM base AS build-deps
-RUN npm install --production=false
-
-FROM build-deps AS build
-COPY . .
-
-# Configura las variables de entorno en la etapa de construcción
 ARG PUBLIC_API_BASE_URL
 ENV PUBLIC_API_BASE_URL=${PUBLIC_API_BASE_URL}
 
+WORKDIR /app/frontend
 RUN npm run build
 
-FROM base AS runtime
-COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
+FROM node:lts-slim AS runtime
+WORKDIR /app
 
+# Copy built output
+COPY --from=builder /app/frontend/dist ./frontend/dist
+# Copy workspace node_modules (includes @progresapp/shared symlink target)
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/shared ./packages/shared
+COPY --from=builder /app/frontend/package.json ./frontend/
+
+WORKDIR /app/frontend
 ENV HOST=0.0.0.0
 ENV PORT=4321
 EXPOSE 4321
