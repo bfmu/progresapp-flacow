@@ -9,6 +9,8 @@
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://localhost:3000/api";
 
+const GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ?? "";
+
 /** @type {import('expo/config').ExpoConfig} */
 module.exports = {
   name: "progresapp-mobile",
@@ -38,8 +40,9 @@ module.exports = {
   web: {
     favicon: "./assets/favicon.png",
   },
-  plugins: ["expo-secure-store"],
+  plugins: ["expo-secure-store", "expo-web-browser"],
   extra: {
     apiBaseUrl: API_BASE_URL,
+    googleClientId: GOOGLE_CLIENT_ID,
   },
 };
