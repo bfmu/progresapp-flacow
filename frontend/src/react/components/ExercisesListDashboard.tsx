@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Importamos useNavigate
-import { getAllExercises } from "../../api/exercises";
+import { getAllExercises } from "@progresapp/shared/api/exercises";
 import Swal from "sweetalert2";
 import {
   TextField,

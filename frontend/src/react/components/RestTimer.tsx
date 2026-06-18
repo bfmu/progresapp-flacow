@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Box, IconButton, Tooltip, Typography, Slider, Paper, Button, Stack } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Pause, PlayArrow, PlayCircle, RestartAlt, Visibility, VisibilityOff, Timer, Fullscreen, FullscreenExit, Brightness4, Brightness7, SkipNext } from "@mui/icons-material";
-import { useTimerStore } from "../../store/timer";
+import { useTimerStore } from "@progresapp/shared/store/timer";
 
 function formatMs(ms: number): string {
   const clamped = Math.max(0, Math.floor(ms / 1000));

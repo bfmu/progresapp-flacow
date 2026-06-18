@@ -1,0 +1,14 @@
+{
+  "name": "progresapp-flacow",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Progresapp monorepo — workspaces for web frontend, mobile app, and shared packages",
+  "workspaces": [
+    "frontend",
+    "mobile",
+    "packages/*"
+  ],
+  "overrides": {
+    "react-native": "0.74.5"
+  }
+}

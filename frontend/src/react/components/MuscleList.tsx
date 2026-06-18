@@ -29,7 +29,7 @@ import {
   deleteMuscle,
   getAllMuscles,
   updateMuscle,
-} from "../../api/muscles";
+} from "@progresapp/shared/api/muscles";
 
 const MuscleList = () => {
   const [muscles, setMuscles] = useState([]);

@@ -1,19 +1,14 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  CreateLiftingHistoryDto,
-  RequestCreateLiftingHistoryDto,
-} from './dto/create-lifting-history.dto';
+import { RequestCreateLiftingHistoryDto } from './dto/create-lifting-history.dto';
 import { UpdateLiftingHistoryDto } from './dto/update-lifting-history.dto';
 import { ActiveUserI } from 'src/common/active-user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LiftingHistory } from './entities/lifting-history.entity';
-import { ExercisesService } from 'src/exercises/exercises.service';
 import { Exercise } from 'src/exercises/entities/exercise.entity';
 
 @Injectable()
@@ -110,20 +105,9 @@ export class LiftingHistoriesService {
     return await this.liftingHistoriesRepository.save(liftingHistory);
   }
 
-  // Eliminar un registro de levantamiento (solo admin)
+  // Eliminar un registro de levantamiento (owner o admin)
   async remove(id: number, user: ActiveUserI) {
-    if (!user.roles.includes('admin')) {
-      throw new ForbiddenException(
-        'You do not have permission to delete this record',
-      );
-    }
-
-    const liftingHistory = await this.liftingHistoriesRepository.findOneBy({
-      id,
-    });
-    if (!liftingHistory) {
-      throw new NotFoundException(`LiftingHistory with ID ${id} not found`);
-    }
+    await this.findOne(id, user); // verifica existencia y ownership
 
     return await this.liftingHistoriesRepository.softDelete(id);
   }

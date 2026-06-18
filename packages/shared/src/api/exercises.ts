@@ -1,4 +1,4 @@
-import apiClient from "../lib/axios";
+import apiClient from "./client";
 
 export const getAllExercises = async () => {
   return await apiClient.get("/exercises");

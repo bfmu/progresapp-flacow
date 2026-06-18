@@ -28,8 +28,8 @@ import {
   deleteExercises,
   getAllExercises,
   updateExercises,
-} from "../../api/exercises";
-import { getAllMuscles } from "../../api/muscles";
+} from "@progresapp/shared/api/exercises";
+import { getAllMuscles } from "@progresapp/shared/api/muscles";
 
 const ExerciseList = () => {
   const [exercises, setExercises] = useState([]);

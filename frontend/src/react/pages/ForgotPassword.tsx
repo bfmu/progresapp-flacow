@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { passwordResetRequest } from "../../api/auth";
+import { passwordResetRequest } from "@progresapp/shared/api/auth";
 import { Container, TextField, Button, Typography, Box, Paper, Stack } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { Link } from "react-router-dom";

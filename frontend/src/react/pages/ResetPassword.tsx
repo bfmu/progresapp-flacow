@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import { resetPasswordRequest } from "../../api/auth";
+import { resetPasswordRequest } from "@progresapp/shared/api/auth";
 import { Container, TextField, Button, Typography, Box, Paper, LinearProgress, Stack } from "@mui/material";
 import { useSnackbar } from "notistack";
 
