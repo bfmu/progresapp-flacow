@@ -47,6 +47,11 @@ jobs:
           EXPO_PUBLIC_GOOGLE_CLIENT_ID: 198417734095-7lo4l5oqv09ksrufeo5leteo8u803c8t.apps.googleusercontent.com
         run: npx expo prebuild --platform android --clean --no-install
 
+      - name: Pin Gradle to 8.6 (RN 0.74 tested version; expo prebuild emits 8.8)
+        run: |
+          sed -i 's/gradle-8\.8-all/gradle-8.6-all/g' mobile/android/gradle/wrapper/gradle-wrapper.properties
+          grep distributionUrl mobile/android/gradle/wrapper/gradle-wrapper.properties
+
       - name: Build debug APK
         working-directory: mobile/android
         env:
