@@ -134,6 +134,16 @@ const SignupForm = () => {
               >
                 Crear Cuenta
               </Button>
+              <Button
+                component="a"
+                href="/api/auth/google"
+                fullWidth
+                variant="outlined"
+                color="primary"
+                sx={{ mb: 2 }}
+              >
+                Continuar con Google
+              </Button>
               <Typography variant="body2" align="center">
                 ¿Ya tienes una cuenta?{" "}
                 <Link

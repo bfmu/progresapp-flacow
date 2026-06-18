@@ -23,6 +23,27 @@ export default function Login() {
   const setProfile = useAuthStore((store) => store.setProfile);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+    if (error === "google_denied") {
+      enqueueSnackbar(
+        "No se pudo autenticar con Google. Intentá de nuevo.",
+        { variant: "error" }
+      );
+    } else if (error === "auth_failed") {
+      enqueueSnackbar(
+        "Error al autenticar con Google. Intentá de nuevo.",
+        { variant: "error" }
+      );
+    } else if (error === "missing_token") {
+      enqueueSnackbar(
+        "No se recibió token de autenticación.",
+        { variant: "error" }
+      );
+    }
+  }, []);
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -125,6 +146,16 @@ export default function Login() {
                 sx={{ mt: 2, mb: 2 }}
               >
                 Entrar
+              </Button>
+              <Button
+                component="a"
+                href="/api/auth/google"
+                fullWidth
+                variant="outlined"
+                color="primary"
+                sx={{ mb: 2 }}
+              >
+                Continuar con Google
               </Button>
               <Typography variant="body2" align="center">
                 ¿No tienes una cuenta?{" "}
