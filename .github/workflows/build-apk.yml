@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build Android APK (EAS)
+    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -28,48 +28,36 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
+
       - name: Install dependencies
         run: npm ci
 
-      - name: Setup EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Build APK (EAS Cloud)
+      - name: Prebuild Android project
         working-directory: mobile
+        env:
+          EXPO_PUBLIC_API_BASE_URL: https://flacow.bfmu.dev/api
+          EXPO_PUBLIC_GOOGLE_CLIENT_ID: 198417734095-7lo4l5oqv09ksrufeo5leteo8u803c8t.apps.googleusercontent.com
+        run: npx expo prebuild --platform android --clean --no-install
+
+      - name: Build debug APK
+        working-directory: mobile/android
+        env:
+          EXPO_PUBLIC_API_BASE_URL: https://flacow.bfmu.dev/api
+          EXPO_PUBLIC_GOOGLE_CLIENT_ID: 198417734095-7lo4l5oqv09ksrufeo5leteo8u803c8t.apps.googleusercontent.com
+        run: ./gradlew :app:assembleDebug --no-daemon
+
+      - name: Prepare APK for upload
         run: |
-          set -eo pipefail
-
-          # Capture JSON; || true prevents set -e from exiting when EAS returns non-zero (failed build)
-          EAS_JSON=$(eas build \
-            --platform android \
-            --profile preview \
-            --non-interactive \
-            --json 2>&1) || true
-
-          echo "=== EAS JSON ==="
-          echo "$EAS_JSON"
-          echo "=== END EAS JSON ==="
-
-          BUILD_STATUS=$(echo "$EAS_JSON" | jq -r '.[0].status // "UNKNOWN"' 2>/dev/null || echo "PARSE_ERROR")
-          BUILD_ERROR_CODE=$(echo "$EAS_JSON" | jq -r '.[0].error.errorCode // empty' 2>/dev/null || true)
-          BUILD_ERROR_MSG=$(echo "$EAS_JSON" | jq -r '.[0].error.message // empty' 2>/dev/null || true)
-          BUILD_URL=$(echo "$EAS_JSON" | jq -r '.[0].artifacts.buildUrl // empty' 2>/dev/null || true)
-
-          echo "Build status: $BUILD_STATUS"
-          [ -n "$BUILD_ERROR_CODE" ] && echo "Error code: $BUILD_ERROR_CODE"
-          [ -n "$BUILD_ERROR_MSG" ] && echo "Error: $BUILD_ERROR_MSG"
-
-          if [ -z "$BUILD_URL" ]; then
-            echo "::error::EAS build failed — status: $BUILD_STATUS, error: $BUILD_ERROR_CODE: $BUILD_ERROR_MSG"
-            exit 1
-          fi
-
-          echo "Downloading APK from EAS..."
-          curl -fL "$BUILD_URL" -o "${{ github.workspace }}/flacow.apk"
-          echo "APK ready — $(du -h "${{ github.workspace }}/flacow.apk" | cut -f1)"
+          cp mobile/android/app/build/outputs/apk/debug/app-debug.apk flacow.apk
+          echo "APK size: $(du -h flacow.apk | cut -f1)"
 
       - name: Deploy APK to server
         uses: appleboy/ssh-action@v1.2.0
