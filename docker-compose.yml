@@ -23,7 +23,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: .
+      dockerfile: frontend/Dockerfile
       args:
         - PUBLIC_API_BASE_URL=${PUBLIC_API_BASE_URL}
     container_name: flacow-frontend
