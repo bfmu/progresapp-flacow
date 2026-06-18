@@ -40,14 +40,30 @@ jobs:
       - name: Build APK (EAS Cloud)
         working-directory: mobile
         run: |
-          BUILD_URL=$(eas build \
+          set -eo pipefail
+
+          # Capture JSON on stdout; progress logs go to stderr (visible in GHA)
+          EAS_JSON=$(eas build \
             --platform android \
             --profile preview \
             --non-interactive \
-            --json 2>/dev/null | jq -r '.[0].artifacts.buildUrl // empty')
+            --json 2>&1)
+
+          echo "=== EAS JSON ==="
+          echo "$EAS_JSON"
+          echo "=== END EAS JSON ==="
+
+          BUILD_STATUS=$(echo "$EAS_JSON" | jq -r '.[0].status // "UNKNOWN"' 2>/dev/null || echo "PARSE_ERROR")
+          BUILD_ERROR_CODE=$(echo "$EAS_JSON" | jq -r '.[0].error.errorCode // empty' 2>/dev/null || true)
+          BUILD_ERROR_MSG=$(echo "$EAS_JSON" | jq -r '.[0].error.message // empty' 2>/dev/null || true)
+          BUILD_URL=$(echo "$EAS_JSON" | jq -r '.[0].artifacts.buildUrl // empty' 2>/dev/null || true)
+
+          echo "Build status: $BUILD_STATUS"
+          [ -n "$BUILD_ERROR_CODE" ] && echo "Error code: $BUILD_ERROR_CODE"
+          [ -n "$BUILD_ERROR_MSG" ] && echo "Error: $BUILD_ERROR_MSG"
 
           if [ -z "$BUILD_URL" ]; then
-            echo "::error::No build URL returned from EAS"
+            echo "::error::EAS build failed — status: $BUILD_STATUS, error: $BUILD_ERROR_CODE: $BUILD_ERROR_MSG"
             exit 1
           fi
 
