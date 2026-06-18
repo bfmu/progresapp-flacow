@@ -14,7 +14,6 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk",
         "gradleCommand": ":app:assembleDebug"
       },
       "env": {
