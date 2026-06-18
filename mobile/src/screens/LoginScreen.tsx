@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { loginRequest } from "@progresapp/shared/api/auth";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import Constants from "expo-constants";
+import { loginRequest, googleIdTokenRequest } from "@progresapp/shared/api/auth";
 import { userInfoRequest } from "@progresapp/shared/api/users";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 import { useAuthStore } from "../lib/auth-store";
 import { mapAuthErrorMessage, validateLoginForm, type LoginFormErrors } from "./validation";
+
+WebBrowser.maybeCompleteAuthSession();
 
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
@@ -18,6 +23,34 @@ export const LoginScreen = ({ navigation }: Props) => {
 
   const setToken = useAuthStore((state) => state.setToken);
   const setProfile = useAuthStore((state) => state.setProfile);
+
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: Constants.expoConfig?.extra?.googleClientId,
+  });
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { id_token } = response.params;
+      handleGoogleSignIn(id_token);
+    } else if (response?.type === "error") {
+      setSubmitError("No se pudo autenticar con Google. Intentá de nuevo.");
+      setLoading(false);
+    }
+  }, [response]);
+
+  const handleGoogleSignIn = async (idToken: string) => {
+    setLoading(true);
+    try {
+      const { accessToken } = await googleIdTokenRequest(idToken);
+      setToken(accessToken);
+      const profile = await userInfoRequest();
+      setProfile(profile);
+    } catch {
+      setSubmitError("No se pudo autenticar con Google. Intentá de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const onSubmit = async () => {
     const validationErrors = validateLoginForm({ email, password });
@@ -106,6 +139,20 @@ export const LoginScreen = ({ navigation }: Props) => {
       >
         <Text className="text-base font-semibold text-white">
           {loading ? "Entrando..." : "Entrar"}
+        </Text>
+      </Pressable>
+
+      <Pressable
+        testID="login-google-button"
+        onPress={() => {
+          setLoading(true);
+          promptAsync();
+        }}
+        disabled={!request || loading}
+        className="mb-4 items-center rounded-md border border-slate-300 bg-white py-3 disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800"
+      >
+        <Text className="text-base font-semibold text-slate-900 dark:text-white">
+          Continuar con Google
         </Text>
       </Pressable>
 

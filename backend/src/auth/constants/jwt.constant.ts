@@ -1,3 +1,3 @@
-export const jwtConstans = {
-    secret: '3e941457fe1124c555afd3da5a56282750f7af67c8b81f04f7ebd5e6a30666ff'
-}
+// Deprecated — use JWT_SECRET environment variable via ConfigService instead.
+// This export is kept only to avoid breaking unused-import errors during migration.
+export const jwtConstans = { secret: '' };
