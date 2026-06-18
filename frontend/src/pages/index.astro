@@ -58,6 +58,36 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </section>
 
+    <!-- Download App -->
+    <section class="max-w-6xl mx-auto px-6 py-16">
+      <div class="rounded-2xl border border-azure/30 bg-gradient-to-br from-neutral-900 to-neutral-800 p-10 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-azure/20 text-azure text-xs font-semibold tracking-wide mb-3">BETA ABIERTA</span>
+          <h2 class="text-2xl md:text-3xl font-bold">Descargá la app para Android</h2>
+          <p class="mt-2 text-gray-400 max-w-md">Llevá tu entrenamiento al bolsillo. Registrá series, pesos y descansá con el timer — todo desde tu celular.</p>
+          <div class="mt-6 flex flex-wrap gap-3 items-center">
+            <a
+              href="/downloads/flacow.apk"
+              download
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-azure text-white font-semibold hover:bg-[#1565c0] transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Descargar APK
+            </a>
+            <span class="text-xs text-gray-500">Android 8.0+ · ~25 MB</span>
+          </div>
+          <p class="mt-4 text-xs text-gray-500">Al instalar, habilitá "Instalar desde fuentes desconocidas" en Ajustes → Seguridad.</p>
+        </div>
+        <div class="flex-shrink-0">
+          <div class="w-32 h-32 rounded-2xl bg-neutral-700 border border-white/10 flex items-center justify-center">
+            <img src="/favicon.svg" alt="FLACOW App" class="w-20 h-20 opacity-80" />
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Features -->
     <section class="max-w-6xl mx-auto px-6 py-16">
       <h2 class="text-2xl md:text-3xl font-semibold text-center">Todo lo que necesitas</h2>
