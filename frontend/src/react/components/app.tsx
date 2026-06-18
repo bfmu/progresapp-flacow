@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import React, { useMemo, lazy, Suspense } from "react";
+import "../../lib/axios";
 import LayoutReact from "./LayoutReact";
 import Loading from "./Loading";
 import ErrorFallback from "./ErrorFallback";
