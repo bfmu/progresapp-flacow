@@ -41,16 +41,6 @@ class StubGoogleStrategy extends GoogleStrategy {
   }
 }
 
-function makeFixedUser(): User {
-  const u = new User();
-  u.id = 1;
-  u.email = 'test@google.com';
-  u.full_name = 'Google User';
-  u.googleId = 'g-123';
-  u.roles = [{ id: 1, name: 'user', users: [] } as Role];
-  return u;
-}
-
 describe('Google OAuth (e2e)', () => {
   let app: INestApplication;
   const FRONTEND_URL = 'http://localhost:4321';

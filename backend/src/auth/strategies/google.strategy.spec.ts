@@ -11,7 +11,7 @@ import { Profile } from 'passport-google-oauth20';
 jest.mock('passport-google-oauth20', () => {
   return {
     Strategy: class MockGooglePassportStrategy {
-      constructor(..._args: any[]) {}
+      constructor() {}
     },
   };
 });
