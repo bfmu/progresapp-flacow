@@ -5,3 +5,4 @@ paths-ignore:
   - "**/*.test.tsx"
   - "**/*.spec.ts"
   - "**/*.spec.tsx"
+  - "backend/src/auth/constants/jwt.constant.ts"

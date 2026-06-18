@@ -89,4 +89,48 @@ export class UsersService {
       roles: userDB.roles.map(role => role.name)
     };
   }
+
+  async findOneByGoogleId(googleId: string): Promise<User | null> {
+    return this.repositoryUser.findOneBy({ googleId });
+  }
+
+  async findOrCreateByGoogle(
+    googleId: string,
+    email: string,
+    fullName: string,
+  ): Promise<User> {
+    // 1. Fast path: user already linked to this Google account (Scenario 1.C)
+    const byGoogleId = await this.findOneByGoogleId(googleId);
+    if (byGoogleId) return byGoogleId;
+
+    // 2. Account linking: existing email+password user first Google login (Scenario 1.B / R3.2 / R3.3)
+    const byEmail = await this.repositoryUser.findOneBy({ email });
+    if (byEmail) {
+      byEmail.googleId = googleId; // only mutate googleId; password and roles preserved
+      return this.repositoryUser.save(byEmail);
+    }
+
+    // 3. New user — password null, role 'user' (Scenario 1.A / R4.2 / R4.3)
+    const userRole = await this.rolesService.findByName('user');
+    if (!userRole) {
+      throw new Error('Role "user" not found.');
+    }
+
+    const newUser = new User();
+    newUser.full_name = fullName;
+    newUser.email = email;
+    newUser.googleId = googleId;
+    newUser.password = null;
+    newUser.roles = [userRole];
+
+    try {
+      return await this.repositoryUser.save(newUser);
+    } catch (err) {
+      // R3.5: race condition — concurrent insert won the unique(googleId) constraint
+      if (err?.code === '23505') {
+        return this.findOneByGoogleId(googleId);
+      }
+      throw err;
+    }
+  }
 }

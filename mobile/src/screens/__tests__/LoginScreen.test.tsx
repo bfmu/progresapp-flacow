@@ -5,6 +5,11 @@
  * - Shows validation error when password is missing
  * - Calls loginRequest with trimmed email+password when form is valid
  * - Shows error message when loginRequest rejects with 401/400
+ * - Renders Google sign-in button
+ * - Tapping Google button calls promptAsync
+ * - Successful Google auth calls googleIdTokenRequest and updates store
+ * - Failed Google auth (response.type='error') shows error message
+ * - Network error in handleGoogleSignIn shows error message
  *
  * Uses @testing-library/react-native with the jest-expo preset.
  * Network and store dependencies are mocked; no real Axios / SecureStore calls.
@@ -28,11 +33,40 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   removeItem: jest.fn(),
 }));
 
+jest.mock("expo-web-browser", () => ({
+  maybeCompleteAuthSession: jest.fn(),
+}));
+
+jest.mock("expo-constants", () => ({
+  default: {
+    expoConfig: {
+      extra: {
+        googleClientId: "test-google-client-id",
+      },
+    },
+  },
+}));
+
+// Controllable mock for Google.useIdTokenAuthRequest.
+// Tests set `mockGoogleResponse` before rendering the component.
+const mockPromptAsync = jest.fn();
+let mockGoogleResponse: Record<string, unknown> | null = null;
+
+jest.mock("expo-auth-session/providers/google", () => ({
+  useIdTokenAuthRequest: jest.fn(() => [
+    { url: "https://accounts.google.com/o/oauth2/auth" }, // mock request object (truthy)
+    mockGoogleResponse,
+    mockPromptAsync,
+  ]),
+}));
+
 const mockLoginRequest = jest.fn();
+const mockGoogleIdTokenRequest = jest.fn();
 const mockUserInfoRequest = jest.fn();
 
 jest.mock("@progresapp/shared/api/auth", () => ({
   loginRequest: (...args: unknown[]) => mockLoginRequest(...args),
+  googleIdTokenRequest: (...args: unknown[]) => mockGoogleIdTokenRequest(...args),
 }));
 
 jest.mock("@progresapp/shared/api/users", () => ({
@@ -75,6 +109,11 @@ const renderScreen = () =>
 // ----- Tests -----
 
 describe("LoginScreen — UI structure", () => {
+  beforeEach(() => {
+    mockGoogleResponse = null;
+    jest.clearAllMocks();
+  });
+
   it("renders email and password inputs plus the submit button", () => {
     const { getByTestId } = renderScreen();
 
@@ -82,9 +121,21 @@ describe("LoginScreen — UI structure", () => {
     expect(getByTestId("login-password-input")).toBeTruthy();
     expect(getByTestId("login-submit-button")).toBeTruthy();
   });
+
+  it("renders Google sign-in button", () => {
+    const { getByTestId, getByText } = renderScreen();
+
+    expect(getByTestId("login-google-button")).toBeTruthy();
+    expect(getByText("Continuar con Google")).toBeTruthy();
+  });
 });
 
 describe("LoginScreen — form validation (mobile-auth spec)", () => {
+  beforeEach(() => {
+    mockGoogleResponse = null;
+    jest.clearAllMocks();
+  });
+
   it("shows a validation error when email is empty on submit", async () => {
     const { getByTestId, getByText } = renderScreen();
 
@@ -128,6 +179,7 @@ describe("LoginScreen — form validation (mobile-auth spec)", () => {
 
 describe("LoginScreen — API integration (mobile-auth spec)", () => {
   beforeEach(() => {
+    mockGoogleResponse = null;
     jest.clearAllMocks();
   });
 
@@ -188,5 +240,78 @@ describe("LoginScreen — API integration (mobile-auth spec)", () => {
     await waitFor(() => {
       expect(getByText("Ocurrió un error. Por favor, inténtalo de nuevo.")).toBeTruthy();
     });
+  });
+});
+
+describe("LoginScreen — Google Sign-In flow (google-oauth spec)", () => {
+  beforeEach(() => {
+    mockGoogleResponse = null;
+    jest.clearAllMocks();
+  });
+
+  it("taps Google button calls promptAsync", async () => {
+    const { getByTestId } = renderScreen();
+
+    await act(async () => {
+      fireEvent.press(getByTestId("login-google-button"));
+    });
+
+    expect(mockPromptAsync).toHaveBeenCalled();
+  });
+
+  it("successful Google auth (response.type=success) calls googleIdTokenRequest and updates store", async () => {
+    mockGoogleIdTokenRequest.mockResolvedValueOnce({ accessToken: "google-jwt-xyz" });
+    mockUserInfoRequest.mockResolvedValueOnce({
+      id: "42",
+      full_name: "Google User",
+      email: "google@example.com",
+    });
+
+    // Set response before rendering so the useEffect fires on mount
+    mockGoogleResponse = { type: "success", params: { id_token: "google-id-token-abc" } };
+
+    renderScreen();
+
+    await waitFor(() => {
+      expect(mockGoogleIdTokenRequest).toHaveBeenCalledWith("google-id-token-abc");
+      expect(mockSetToken).toHaveBeenCalledWith("google-jwt-xyz");
+      expect(mockSetProfile).toHaveBeenCalledWith({
+        id: "42",
+        full_name: "Google User",
+        email: "google@example.com",
+      });
+    });
+  });
+
+  it("failed Google auth (response.type=error) shows error message and resets loading", async () => {
+    mockGoogleResponse = { type: "error", error: { code: "access_denied" } };
+
+    const { getByText } = renderScreen();
+
+    await waitFor(() => {
+      expect(
+        getByText("No se pudo autenticar con Google. Intentá de nuevo.")
+      ).toBeTruthy();
+    });
+
+    // googleIdTokenRequest must NOT be called — Google flow failed before id_token
+    expect(mockGoogleIdTokenRequest).not.toHaveBeenCalled();
+  });
+
+  it("network error in handleGoogleSignIn shows error message and resets loading", async () => {
+    mockGoogleIdTokenRequest.mockRejectedValueOnce(new Error("Network Error"));
+    mockGoogleResponse = { type: "success", params: { id_token: "valid-token" } };
+
+    const { getByText } = renderScreen();
+
+    await waitFor(() => {
+      expect(
+        getByText("No se pudo autenticar con Google. Intentá de nuevo.")
+      ).toBeTruthy();
+    });
+
+    expect(mockGoogleIdTokenRequest).toHaveBeenCalledWith("valid-token");
+    // setToken must NOT have been called since request failed
+    expect(mockSetToken).not.toHaveBeenCalled();
   });
 });

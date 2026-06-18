@@ -20,6 +20,7 @@ const LiftingHistoryPage = lazy(() => import("../pages/LiftingHistoryPage"));
 import RoleRoute from "./RoleRoute";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
+import AuthCallback from "../pages/AuthCallback";
 
 export const App = () => {
   const isAuth = useAuthStore((state) => state.isAuth);
@@ -73,6 +74,7 @@ export const App = () => {
         { path: "register", element: <Register /> },
         { path: "forgot-password", element: <ForgotPassword /> },
         { path: "reset-password", element: <ResetPassword /> },
+        { path: "auth/callback", element: <AuthCallback /> },
         {
           element: <ProtectedRoute isAllowed={isAuth} />,
           errorElement: <ErrorFallback />,

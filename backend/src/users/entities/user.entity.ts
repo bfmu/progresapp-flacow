@@ -22,6 +22,9 @@ export class User {
   @Column({ nullable: true, select: false })
   password: string;
 
+  @Column({ unique: true, nullable: true })
+  googleId: string;
+
   @DeleteDateColumn({ select: false })
   deleteAt: Date;
 
