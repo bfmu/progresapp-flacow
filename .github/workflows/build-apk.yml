@@ -44,7 +44,7 @@ jobs:
             --platform android \
             --profile preview \
             --non-interactive \
-            --json 2>/dev/null | jq -r '.artifacts.buildUrl // empty')
+            --json 2>/dev/null | jq -r '.[0].artifacts.buildUrl // empty')
 
           if [ -z "$BUILD_URL" ]; then
             echo "::error::No build URL returned from EAS"
