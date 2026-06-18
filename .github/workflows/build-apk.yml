@@ -42,12 +42,12 @@ jobs:
         run: |
           set -eo pipefail
 
-          # Capture JSON on stdout; progress logs go to stderr (visible in GHA)
+          # Capture JSON; || true prevents set -e from exiting when EAS returns non-zero (failed build)
           EAS_JSON=$(eas build \
             --platform android \
             --profile preview \
             --non-interactive \
-            --json 2>&1)
+            --json 2>&1) || true
 
           echo "=== EAS JSON ==="
           echo "$EAS_JSON"
