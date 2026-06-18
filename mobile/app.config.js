@@ -44,5 +44,8 @@ module.exports = {
   extra: {
     apiBaseUrl: API_BASE_URL,
     googleClientId: GOOGLE_CLIENT_ID,
+    eas: {
+      projectId: "ada4c02f-0e70-4cdd-be6c-fd7eff634095",
+    },
   },
 };
