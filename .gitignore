@@ -88,3 +88,17 @@ frontend/.env
 
 # jetbrains setting folder
 .idea/
+
+# SDD infrastructure
+.atl/
+
+# ================ EXPO / REACT NATIVE ========================
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+*.orig.*
+mobile/*.jks
+mobile/*.p8
+mobile/*.p12
+mobile/*.key
+mobile/*.mobileprovision

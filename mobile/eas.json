@@ -1,0 +1,31 @@
+{
+  "_comment": "EXPO_PUBLIC_API_BASE_URL values below are placeholders. Replace with real backend URLs per environment (see backend/.env.example for CORS_ORIGINS that must allow these origins). development points at a LAN/tunnel URL for Expo Go on a physical device; preview/production point at deployed API hosts.",
+  "cli": {
+    "version": ">= 13.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.1.100:3000/api"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://staging-api.progresapp.example.com/api"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://api.progresapp.example.com/api"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { LiftingHistoriesService } from './lifting-histories.service';
-import { CreateLiftingHistoryDto, RequestCreateLiftingHistoryDto } from './dto/create-lifting-history.dto';
+import { RequestCreateLiftingHistoryDto } from './dto/create-lifting-history.dto';
 import { UpdateLiftingHistoryDto } from './dto/update-lifting-history.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { ActiveUser } from 'src/common/active-user.decorator';

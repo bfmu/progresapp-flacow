@@ -13,10 +13,10 @@ import {
 import {
   createLiftingHistorie,
   getAllLiftingHistoriesForExercise,
-} from "../../api/lifting-histories";
+} from "@progresapp/shared/api/lifting-histories";
 import { enqueueSnackbar } from "notistack";
 import Navbar from "../components/Navbar";
-import { getExercise } from "../../api/exercises";
+import { getExercise } from "@progresapp/shared/api/exercises";
 
 const LiftingHistoryPage = () => {
   const { exerciseId } = useParams();
