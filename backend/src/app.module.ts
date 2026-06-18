@@ -8,11 +8,20 @@ import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { InitModule } from './init/init.module';
 import { LiftingHistoriesModule } from './lifting-histories/lifting-histories.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validationSchema: Joi.object({
+        JWT_SECRET: Joi.string().required(),
+        GOOGLE_CLIENT_ID: Joi.string().optional().allow(''),
+        GOOGLE_CLIENT_SECRET: Joi.string().optional().allow(''),
+        GOOGLE_CALLBACK_URL: Joi.string().optional().allow(''),
+        GOOGLE_MOBILE_CLIENT_ID: Joi.string().optional().allow(''),
+        FRONTEND_BASE_URL: Joi.string().optional().allow(''),
+      }),
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

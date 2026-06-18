@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, ServiceUnavailableException, Logger } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 
 import * as bcryptjs from 'bcryptjs';
@@ -45,21 +46,28 @@ export class AuthService {
       throw new BadRequestException('Dont exists user');
     }
 
+    // R4.1: Google-only users have password = null — guard BEFORE bcryptjs.compare
+    if (!user.password) {
+      throw new BadRequestException({
+        error: 'google_only',
+        message: 'Use Google sign-in',
+      });
+    }
+
     const validPassword = await bcryptjs.compare(password, user.password);
 
     if (!validPassword) {
       throw new BadRequestException('Invalid password');
     }
 
-    const roles = user.roles.map((role) => role.name)
+    return this.signToken(user);
+  }
 
+  async signToken(user: User): Promise<{ accessToken: string }> {
+    const roles = user.roles.map((role) => role.name);
     const payload = { email: user.email, sub: user.id, roles };
-
     const jwtToken = await this.jwtService.signAsync(payload);
-
-    return {
-      accessToken: jwtToken
-    };
+    return { accessToken: jwtToken };
   }
 
   async forgotPassword(email: string) {
