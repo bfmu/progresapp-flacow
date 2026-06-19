@@ -52,6 +52,11 @@ jobs:
           sed -i 's/gradle-8\.8-all/gradle-8.6-all/g' mobile/android/gradle/wrapper/gradle-wrapper.properties
           grep distributionUrl mobile/android/gradle/wrapper/gradle-wrapper.properties
 
+      - name: Increase Gradle JVM heap and disable Jetifier
+        run: |
+          echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError" >> mobile/android/gradle.properties
+          echo "android.enableJetifier=false" >> mobile/android/gradle.properties
+
       - name: Build debug APK
         working-directory: mobile/android
         env:
