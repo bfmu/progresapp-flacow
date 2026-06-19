@@ -62,7 +62,7 @@ jobs:
         env:
           EXPO_PUBLIC_API_BASE_URL: https://flacow.bfmu.dev/api
           EXPO_PUBLIC_GOOGLE_CLIENT_ID: 198417734095-7lo4l5oqv09ksrufeo5leteo8u803c8t.apps.googleusercontent.com
-        run: ./gradlew :app:assembleDebug --no-daemon
+        run: ./gradlew :app:assembleDebug -PbundleInDebug=true --no-daemon
 
       - name: Prepare APK for upload
         run: |
