@@ -40,7 +40,7 @@ module.exports = {
   web: {
     favicon: "./assets/favicon.png",
   },
-  plugins: ["expo-secure-store", "expo-web-browser"],
+  plugins: ["expo-secure-store"],
   extra: {
     apiBaseUrl: API_BASE_URL,
     googleClientId: GOOGLE_CLIENT_ID,
